@@ -16,10 +16,10 @@
 5. work: 业务服务
 
 # 使用版本
-seata-server-1.3.0
-nacos-server-2.4.0.1
-sentinel-dashboard-1.8.1
-logstash-7.6.2
-elasticsearch-7.6.2
-filebeat-7.6.2-windows-x86_64
-kibana-7.6.2-windows-x86_64
+1. seata-server-1.3.0
+2. nacos-server-2.4.0.1
+3. sentinel-dashboard-1.8.1
+4. logstash-7.6.2
+5. elasticsearch-7.6.2
+6. filebeat-7.6.2-windows-x86_64
+7. kibana-7.6.2-windows-x86_64
