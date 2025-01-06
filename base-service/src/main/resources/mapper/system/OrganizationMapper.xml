@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.OrganizationMapper">
+    <!--根据父级id查询所有子集 -->
+    <sql id="Base_Column">
+        SELECT
+            organization_id
+        FROM
+            sys_organization
+        WHERE
+            organization_id = #{organizationId}
+            AND STATUS = 1 UNION
+        SELECT
+            t3.organization_id
+        FROM
+        (
+        SELECT
+            t1.organization_id,
+            IF( FIND_IN_SET( parent_id, @pids ) > 0, @pids := CONCAT( @pids, ',', organization_id ), "0" ) AS ischild
+        FROM
+            ( SELECT organization_id, parent_id FROM sys_organization t WHERE t.STATUS = 1 ORDER BY organization_id ) t1,
+            ( SELECT @pids := #{organizationId} ) t2
+        ) t3
+        WHERE
+        ischild != "0"
+    </sql>
+    <!--查询组织树 -->
+    <select id="selectOrganizationList" resultType="com.yss.baseservice.application.system.dto.OrganizationDto">
+        SELECT
+        o.organization_id as id,
+        o.parent_id as parentId,
+        o.organization_name as organizationName,
+        o.create_time as createTime
+        FROM
+        sys_organization o JOIN sys_user u ON u.user_id = o.create_user_id
+        AND u.`status` = 1
+        WHERE
+        o.status = 1
+        <if test="organizationName != null and organizationName != ''">
+            AND o.organization_name LIKE CONCAT('%',#{organizationName},'%')
+        </if>
+    </select>
+    <select id="getAllStudent"
+            resultType="com.yss.baseservice.application.system.dto.OrganizationStudentDto">
+        SELECT
+        o.organization_id AS id,
+        o.parent_id AS parentId,
+        o.organization_name AS organizationName,1 as type,
+        o.create_time AS createTime
+        FROM
+        sys_organization o
+        WHERE o.status = 1
+        <if test="name != null and name != ''">
+            AND o.organization_name LIKE CONCAT('%',#{name},'%')
+        </if>
+        UNION
+        ALL
+        SELECT
+        s.student_id AS id,o.`organization_id` AS parentId,s.student_number AS organizationName,2 as type,s.create_time AS create_time
+        FROM
+        t_student s
+        LEFT JOIN sys_organization o
+        ON o.`organization_id` = s.organization_id
+        WHERE s.status = 1
+        <if test="name != null and name != ''">
+            AND o.organization_name LIKE CONCAT('%',#{name},'%')
+        </if>
+    </select>
+    <select id="selectOrg" resultType="java.lang.Integer">
+        select a.organization_id from (SELECT DISTINCT
+            o.`organization_id`,o.status
+        FROM
+            sys_organization o
+        WHERE o.status = 1 and o.`organization_id` in
+        <foreach collection="ids" index="index" item="i" open="("
+                 separator="," close=")">
+            #{i}
+        </foreach>
+           OR o.`parent_id` IN
+        <foreach collection="ids" index="index" item="i" open="("
+                 separator="," close=")">
+            #{i}
+        </foreach>)a WHERE a.status = 1
+    </select>
+
+    <!-- 删除组织（如果有下级，删除下级）-->
+    <update id="deleteOrganization">
+        update
+        sys_organization o,
+        (select organization_id  from (<include refid="Base_Column"/>) as tesc) s
+        set o.status = 0
+        where
+        s.organization_id = o.organization_id
+    </update>
+
+
+
+
+</mapper>

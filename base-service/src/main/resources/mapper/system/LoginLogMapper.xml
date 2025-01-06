@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.LoginLogMapper">
+    <select id="selectLoginLog" resultType="com.yss.baseservice.application.system.dto.LoginLogDto">
+        SELECT
+            *
+        FROM
+            sys_login_log
+        WHERE
+            1 = 1
+        <if test="username != null and username != ''">
+            AND real_name LIKE CONCAT('%',#{username},'%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND login_time &gt;= #{startDate}
+            AND login_time &lt; DATE_ADD( #{endDate}, INTERVAL 1 DAY )
+        </if>
+        ORDER BY
+            login_time DESC
+    </select>
+</mapper>

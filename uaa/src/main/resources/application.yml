@@ -1,0 +1,48 @@
+server:
+  port: 8500
+  servlet:
+    session:
+      cookie:
+        path: /
+spring:
+  application:
+    name: uaa-server
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.1.14:8848
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://192.168.1.14:3306/cloud_base?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 600000
+      maximum-pool-size: 10
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 6
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password:
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+#暴露监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

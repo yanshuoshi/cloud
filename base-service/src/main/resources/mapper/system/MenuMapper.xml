@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.MenuMapper">
+    <!--菜单以及菜单所有子集 -->
+    <sql id="Base_Column">
+        SELECT
+            menu_id
+        FROM
+            sys_menu
+        WHERE
+            menu_id = #{menuId}
+            AND STATUS = 1 UNION
+        SELECT
+            t3.menu_id
+        FROM
+        (
+        SELECT
+            t1.menu_id,
+            IF( FIND_IN_SET( parent_id, @pids ) > 0, @pids := CONCAT( @pids, ',', menu_id ), "0" ) AS ischild
+        FROM
+            ( SELECT menu_id, parent_id FROM sys_menu t WHERE t.STATUS = 1 ORDER BY menu_id ) t1,
+            ( SELECT @pids := #{menuId} ) t2
+        ) t3
+        WHERE
+        ischild != "0"
+    </sql>
+
+    <!--查询菜单列表 -->
+    <select id="selectMenuList" resultType="com.yss.baseservice.application.system.dto.MenuDto">
+        SELECT
+        m.menu_id as id,
+        m.parent_id as parentId,
+        m.menu_name as menuName,
+        m.path,
+        m.menu_type as menuType,
+        m.permission_key as permissionKey,
+        m.sort,
+        m.create_time as createTime,
+        m.status
+        FROM
+        sys_menu m
+        LEFT JOIN sys_user u ON u.user_id = m.create_user_id
+        AND u.`status` = 1
+        WHERE
+        m.status = 1
+        <if test="menuName != null and menuName != ''">
+            AND m.menu_name LIKE CONCAT('%',#{menuName},'%')
+        </if>
+        order by m.parent_id asc
+    </select>
+
+    <!-- 根据id查询菜单-->
+    <select id="selectMenuById" resultType="com.yss.baseservice.application.system.dto.MenuDto">
+        SELECT
+        m.menu_id as menuId,
+        m.parent_id as parentId,
+        m.menu_name as menuName,
+        m.path,
+        m.menu_type as menuType,
+        m.permission_key as permissionKey,
+        m.sort,
+        m.create_time as createTime,
+        m.status
+        FROM
+        sys_menu m
+        LEFT JOIN sys_user u ON u.user_id = m.create_user_id
+        AND u.`status` = 1
+        WHERE
+        m.status = 1
+        AND m.menu_id= #{menuId}
+    </select>
+
+    <!-- 查询菜单树-->
+    <select id="selectMenuTree" resultType="com.yss.baseservice.application.system.dto.MenuTreeDto">
+        SELECT
+	      m1.MENU_ID AS id,
+	      ( CASE WHEN ( m2.MENU_ID = 0 OR m2.MENU_ID IS NULL ) THEN 0 ELSE m2.MENU_ID END ) AS parentId,
+	      m1.menu_name AS menuName,
+	      ( CASE WHEN ( m2.MENU_ID = 0 OR m2.MENU_ID IS NULL ) THEN 'true' ELSE 'false' END ) AS open
+        FROM
+	      sys_menu m1
+	    LEFT JOIN sys_menu m2 ON m1.parent_id = m2.menu_id
+	    where
+	    m1.status = 1
+        ORDER BY
+	       m1.parent_id ASC
+    </select>
+
+    <!-- 查询菜单树 (包含菜单配置情况)-->
+    <select id="selectMenuTreeByMenuId" resultType="com.yss.baseservice.application.system.dto.MenuTreeDto">
+        SELECT
+            m1.MENU_ID AS id,
+            ( CASE WHEN ( m2.MENU_ID = 0 OR m2.MENU_ID IS NULL ) THEN 0 ELSE m2.MENU_ID END ) AS parentId,
+            m1.menu_name AS menuName,
+            ( CASE WHEN ( m2.MENU_ID = 0 OR m2.MENU_ID IS NULL ) THEN 'true' ELSE 'false' END ) AS open,
+            ( CASE WHEN ( m3.MENU_ID = 0 OR m3.MENU_ID IS NULL ) THEN 'false' ELSE 'true' END ) AS `checked`
+        FROM
+            sys_menu m1
+            LEFT JOIN sys_menu m2 ON m1.parent_id = m2.menu_id
+            LEFT JOIN ( SELECT MENU_ID FROM sys_menu WHERE MENU_ID IN
+            <foreach collection="menuIdList" index="index" item="i" open="("
+                     separator="," close=")">
+                #{i}
+            </foreach>
+            ) m3 ON m1.MENU_ID = m3.MENU_ID
+        where
+        m1.status = 1
+        ORDER BY
+            m1.parent_id ASC
+    </select>
+    <!-- 删除菜单（如果有下级，删除下级）-->
+    <update id="deleteMenu">
+        update
+        sys_menu m,
+        (select menu_id  from (<include refid="Base_Column"/>) as tesc) s
+        set m.status = 0
+        where
+        s.menu_id = m.menu_id
+    </update>
+
+
+</mapper>

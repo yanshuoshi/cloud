@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.RoleMenuMapper">
+    <!--菜单是否包含下级 -->
+    <sql id="Base_Column">
+        SELECT
+            menu_id
+        FROM
+            sys_menu
+        WHERE
+            menu_id = #{menuId}
+            AND STATUS = 1 UNION
+        SELECT
+            t3.menu_id
+        FROM
+        (
+        SELECT
+            t1.menu_id,
+            IF( FIND_IN_SET( parent_id, @pids ) > 0, @pids := CONCAT( @pids, ',', menu_id ), 0 ) AS ischild
+        FROM
+            ( SELECT menu_id, parent_id FROM sys_menu t WHERE t.STATUS = 1 ORDER BY menu_id ) t1,
+            ( SELECT @pids := #{menuId} ) t2
+        ) t3
+        WHERE
+        ischild != 0
+    </sql>
+    <!-- 查询权限-->
+    <select id="selectPermissionAll" resultType="com.yss.baseservice.application.system.dto.RoleNumberPermissionUrlDto">
+        SELECT
+            r.role_key AS role,
+            m.permission_key AS permission
+        FROM
+            sys_role_menu srm
+            LEFT JOIN sys_role r ON r.ROLE_ID = srm.ROLE_ID
+            LEFT JOIN sys_menu m ON m.MENU_ID = srm.MENU_ID
+    </select>
+
+    <!--保存权限配置 -->
+    <insert id="insertAll">
+        INSERT INTO
+        sys_role_menu(role_id, menu_id)
+        VALUES
+        <foreach collection="list" separator="," index="index" item="item" >
+            (
+            #{item.roleId},
+            #{item.menuId}
+            )
+        </foreach>
+    </insert>
+
+    <!--删除角色菜单关联 -->
+    <delete id="deleteByRoleOrMenu">
+        delete from sys_role_menu
+        where
+        1=1
+        <if test="menuId != null and menuId != ''">
+            AND menu_id = #{menuId}
+        </if>
+        <if test="roleId != null and roleId != ''">
+            AND role_id = #{roleId}
+        </if>
+    </delete>
+
+    <!--删除角色和菜单的关联关系（包含下级） -->
+    <delete id="deleteByMenuId">
+        delete
+        r
+        from
+        sys_role_menu  r,
+        (
+        <include refid="Base_Column"/>
+        )  s
+        where
+        r.menu_id = s.menu_id
+    </delete>
+
+</mapper>

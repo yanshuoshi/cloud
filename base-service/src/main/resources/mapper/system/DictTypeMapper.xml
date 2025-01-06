@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.DictTypeMapper">
+    <!--查询字典列表 -->
+    <select id="selectDictTypeList" resultType="com.yss.baseservice.application.system.dto.DictTypeDto">
+        SELECT
+        d.dict_id as dictId,
+        d.dict_name as dictName,
+        d.dict_type as dictType,
+        d.status,
+        d.remark,
+        d.create_time as createTime
+        FROM
+        sys_dict_type d
+        WHERE
+        1=1
+        <if test="dictName != null and dictName != ''">
+            AND d.dict_name LIKE CONCAT('%',#{dictName},'%')
+        </if>
+        <if test="dictType != null and dictType != ''">
+            AND d.dict_type LIKE CONCAT('%',#{dictType},'%')
+        </if>
+        <if test="status != null">
+            AND d.status = #{status}
+        </if>
+        order by d.create_time desc
+    </select>
+</mapper>

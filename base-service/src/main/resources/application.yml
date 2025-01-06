@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: base-service
+  profiles:
+    active: dev
+# MP 其他配置
+mybatis-plus:
+  # 配置xml的扫描路径，不放在resource下面需要在pom里添加一段代码（小坑）
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 别名包扫描路径，通过该属性可以给包中的类注册别名，注册后在 Mapper 对应的 XML 文件中可以直接使用类名，而不用使用全限定的类名
+  typeAliasesPackage: com.yss.*.*.entity
+  # 枚举扫描路径
+  type-enums-package: com.yss.*.*.enums
+  global-config:
+    # 数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID",ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: AUTO
+  configuration:
+    map-underscore-to-camel-case: true
+#配置分页插件pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+  row-bounds-with-count: true
+#日志
+#logging:
+#  file:
+#    name: ../logs/base-service.log
+#  level:
+#    root: INFO
+#    com:
+#      yss: DEBUG
+#    sql.com.yss: DEBUG

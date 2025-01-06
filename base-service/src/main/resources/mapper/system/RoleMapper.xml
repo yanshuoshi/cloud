@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.baseservice.domain.system.mapper.RoleMapper">
+    <select id="selectRoleList" resultType="com.yss.baseservice.application.system.dto.RoleDto">
+        SELECT
+            r.role_id as roleId,
+            r.role_name as roleName,
+            r.role_key as roleKey,
+            r.create_time as createTime,
+            u.username AS createUserName
+        FROM
+            sys_role r
+            LEFT JOIN sys_user u ON u.user_id = r.create_user_id and u.status =1
+        WHERE
+            r.`status` = 1
+        <if test="roleName != null and roleName != ''">
+            AND  r.role_name LIKE CONCAT('%',#{roleName},'%')
+        </if>
+        <if test="roleKey != null and roleKey != ''">
+            AND u.role_key LIKE CONCAT('%',#{roleKey},'%')
+        </if>
+        ORDER BY
+            r.create_time DESC
+    </select>
+    
+    <!-- 角色选择列表-->
+    <select id="roleAll" resultType="com.yss.baseservice.application.system.dto.RoleCheckDto">
+        SELECT
+            r.ROLE_ID AS roleId,
+            r.role_name AS roleName,
+            ( CASE WHEN ( r1.ROLE_ID = 0 OR r1.ROLE_ID IS NULL ) THEN 'false' ELSE 'true' END ) AS checked
+        FROM
+	        sys_role r
+	    LEFT JOIN (
+            SELECT
+	            ROLE_ID
+            FROM
+	            sys_role
+            WHERE
+	            ROLE_ID IN (SELECT role_id from sys_user_role WHERE user_id = #{userId})
+	    ) r1 ON r.ROLE_ID = r1.ROLE_ID
+    </select>
+    <select id="selectMenuByUserId" resultType="com.yss.baseservice.application.system.dto.RoleByUserIdDto">
+        select
+            r.`role_id`,r.`role_key`
+        from
+            sys_role r
+                left join sys_user_role ur
+                          on r.`role_id` = ur.`role_id`
+        where ur.`user_id`  = #{userId}
+    </select>
+
+</mapper>
