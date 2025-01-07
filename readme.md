@@ -23,3 +23,22 @@
 5. elasticsearch-7.6.2
 6. filebeat-7.6.2-windows-x86_64
 7. kibana-7.6.2-windows-x86_64
+
+
+# 密码模式：
+localhost:9000/uaa/oauth/token
+post
+grant_type:password
+username:cs
+password:123
+user_type:admin
+client_id:client_id
+client_secret:secret
+
+# 授权码模式
+http://localhost:9000/uaa/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2Fwww.baidu.com
+
+http://client_id:secret@192.168.1.14:9000/uaa/oauth/token
+post
+grant_type:authorization_code
+code:授权码

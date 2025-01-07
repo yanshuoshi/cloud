@@ -10,7 +10,10 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.1.14:8848
+        server-addr: 192.168.1.14:8849
+        namespace: efa14972-274c-45bb-83e5-48c795ce99cd
+        username: yss
+        password: 123
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
