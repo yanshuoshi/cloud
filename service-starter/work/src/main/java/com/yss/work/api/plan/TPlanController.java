@@ -1,7 +1,6 @@
 package com.yss.work.api.plan;
 
 import com.common.base.BaseController;
-import com.common.base.BaseException;
 import com.common.base.Response;
 import com.common.base.ValidationGroup;
 import com.github.pagehelper.PageInfo;
