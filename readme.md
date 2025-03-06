@@ -36,7 +36,7 @@ client_id:client_id
 client_secret:secret
 
 # 授权码模式
-http://localhost:9000/uaa/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2Fwww.baidu.com
+http://192.168.1.14:9000/uaa/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http://www.baidu.com
 
 http://client_id:secret@192.168.1.14:9000/uaa/oauth/token
 post

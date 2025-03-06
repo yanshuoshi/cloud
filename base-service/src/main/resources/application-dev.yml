@@ -8,8 +8,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.1.14:8849
-        namespace: efa14972-274c-45bb-83e5-48c795ce99cd
+        server-addr: 192.168.1.14:8848
         username: yss
         password: 123
     sentinel:
@@ -84,7 +83,7 @@ seata:
     # 配置 seata 的注册中心, 告诉 seata client 怎么去访问 seata server 事务协调者进行通信
     type: nacos
     nacos:
-      server-addr: 192.168.1.14:8849 # seata-server 所在的注册中心地址
+      server-addr: 192.168.1.14:8848 # seata-server 所在的注册中心地址
       application: seata-server # 指定 seata-server 在注册中心的 服务名， (默认 seata-server)
       username: nacos
       password: nacos
@@ -93,7 +92,7 @@ seata:
     # 配置 seata 的配置中心，可以读取关于 seata client 的一些配置，即 "seata\seata\script\config-center\config.txt" 中的配置
     type: nacos
     nacos: # 配置中心
-      server-addr: 192.168.1.14:8849
+      server-addr: 192.168.1.14:8848
       username: nacos
       password: nacos
       group: SEATA_GROUP

@@ -16,8 +16,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.1.14:8849
-        namespace: efa14972-274c-45bb-83e5-48c795ce99cd
+        server-addr: 192.168.1.14:8848
         username: yss
         password: 123
     gateway:
@@ -33,7 +32,7 @@ spring:
           predicates:
             - Path=/uaa/**
           filters:
-            - RewritePath=/uaa/(?<segment>.*),/$\{segment}
+            - RewritePath=/uaa/(?<segment>.*), /${segment}
         - id: work-server
           uri: lb://work-server
           predicates:

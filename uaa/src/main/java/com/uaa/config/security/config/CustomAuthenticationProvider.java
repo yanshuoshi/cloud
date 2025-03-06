@@ -1,6 +1,5 @@
 package com.uaa.config.security.config;
 
-import com.alibaba.fastjson.JSONObject;
 import com.uaa.config.security.service.SecurityStudentDetailService;
 import com.uaa.config.security.service.SecurityUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +31,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         UserDetailsService userDetailsService;
-        if(authentication.getDetails() instanceof WebAuthenticationDetails){
+        if (authentication.getDetails() instanceof WebAuthenticationDetails) {
             // 授权码模式
             userDetailsService = securityUserDetailService;
-        }else{
+        } else {
             // 密码模式
             Map<String, Object> details = (Map) authentication.getDetails(); // 获取用户类型
             if ("admin".equals(details.get("user_type"))) {
