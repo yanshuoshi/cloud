@@ -13,6 +13,7 @@ spring:
         server-addr: 192.168.1.14:8848
         username: yss
         password: 123
+        enabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -31,11 +31,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth
-                .authenticationProvider(customAuthenticationProvider) ;// 使用自定义认证提供者
+                .authenticationProvider(customAuthenticationProvider);// 使用自定义认证提供者
 //        .userDetailsService(securityUserDetailService).passwordEncoder(passwordEncoder());
     }
 
 //    /**
+//     * uaa有controller时使用
+//     * @param http
+//     * @throws Exception
+//     */
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http
+//                .csrf().disable() // 禁用 CSRF 保护
+//                .authorizeRequests()
+//                .antMatchers("/u/oauth/revoke").permitAll() // 允许未认证用户访问
+//                .anyRequest().authenticated();
+//    }
+    //    /**
 //     * 密码模式配置时使用(注释掉可以同时支持密码模式和授权码模式)
 //     *
 //     * @param http
@@ -48,6 +61,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/oauth/token").permitAll() // 允许未认证用户访问/oauth/token端点
 ////                .antMatchers("/oauth/authorize").permitAll() // 允许未认证用户访问/oauth/token端点
 //                .anyRequest().authenticated(); // 所有其他请求都需要认证
+//    }
+
+//    /**
+//     * csrf 配置
+//     * @param http
+//     * @throws Exception
+//     */
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf
+//                        .ignoringAntMatchers("/oauth/token", "/public/**") // 忽略特定路径
+//                )
+//                .authorizeRequests()
+//                .antMatchers(
+//                        "/login", "/oauth/authorize")
+//                .authenticated();
 //    }
 
     /**

@@ -1,5 +1,6 @@
 server:
   port: 9000
+  max-http-header-size: 16KB
 
 spring:
   application:
@@ -13,6 +14,9 @@ spring:
     port: 6379
     # Redis服务器连接密码（默认为空）
     password:
+  security:
+    csrf:
+      enabled: true
   cloud:
     nacos:
       discovery:
@@ -39,7 +43,7 @@ spring:
             - Path=/work/**
           filters:
             - RewritePath=/work/(?<segment>.*),/$\{segment}
-        - id: work-server
+        - id: base-server
           uri: lb://base-service
           predicates:
             - Path=/base/**

@@ -25,7 +25,7 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
     /**
      * 资源ID
      */
-    private static final String RESOURCE_ID = "res2";
+    private static final String RESOURCE_ID = "res1";
 
 
     /**

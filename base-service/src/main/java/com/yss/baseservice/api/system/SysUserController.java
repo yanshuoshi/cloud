@@ -1,7 +1,6 @@
 package com.yss.baseservice.api.system;
 
 import com.common.base.BaseController;
-import com.common.base.BaseException;
 import com.common.base.Response;
 import com.github.pagehelper.PageInfo;
 import com.yss.baseservice.api.system.request.ChangePasswordReq;
@@ -12,18 +11,11 @@ import com.yss.baseservice.application.system.SysUserApplication;
 import com.yss.baseservice.application.system.dto.SysUserDto;
 import com.yss.baseservice.domain.system.entity.SysUser;
 import com.yss.baseservice.infrastructure.common.aspect.OperLog;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -33,18 +25,12 @@ import java.util.concurrent.TimeUnit;
  * @date 2021/11/1
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/system/sysUser")
 public class SysUserController extends BaseController {
 
     private final SysUserApplication sysUserApplication;
-    private final TokenStore tokenStore;
-    private final RedisTemplate<String, String> redisTemplate;
 
-    public SysUserController(SysUserApplication sysUserApplication, TokenStore tokenStore, RedisTemplate<String, String> redisTemplate) {
-        this.sysUserApplication = sysUserApplication;
-        this.tokenStore = tokenStore;
-        this.redisTemplate = redisTemplate;
-    }
 
     /**
      * 系统用户分页列表
@@ -147,29 +133,5 @@ public class SysUserController extends BaseController {
         return Response.ok(sysUserDto);
     }
 
-    /**
-     * 退出登录
-     *
-     * @param request
-     */
-    @GetMapping("/logout")
-    public Response revokeToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (StringUtils.isBlank(authHeader)) {
-            throw new BaseException(500, "token不存在");
-        }
-        String tokenValue = authHeader.replace("Bearer", "").trim();
-        OAuth2AccessToken accessToken = tokenStore.readAccessToken(tokenValue);
-        tokenStore.removeAccessToken(accessToken);
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            // 清除 session
-            session.invalidate();
-        }
-        // 清除认证状态
-        SecurityContextHolder.clearContext();
-        // jwt黑名单 因为jwt是无状态的，所以需要将token加入黑名单
-        redisTemplate.opsForValue().set("jwtblacklist:" + tokenValue, tokenValue, 24, TimeUnit.HOURS);
-        return Response.ok();
-    }
+
 }

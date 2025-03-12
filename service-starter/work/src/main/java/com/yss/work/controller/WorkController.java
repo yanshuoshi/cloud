@@ -23,8 +23,7 @@ public class WorkController extends BaseController {
      * 测试接口
      */
     @GetMapping("/test")
-    @PreAuthorize("hasAnyAuthority('teacher','student')")
-    public Object rs(HttpServletRequest request){
+    public Object rs(){
         Map<String,Object> map=new HashMap<>();
         map.put("test",100);
         return map;

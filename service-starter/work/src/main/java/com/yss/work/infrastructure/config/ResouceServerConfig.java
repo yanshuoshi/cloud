@@ -46,6 +46,7 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/oauth/revoke").permitAll() // 明确允许撤销接口
                 .antMatchers("/**")
 //                .access("#oauth2.hasScope('ROLE_*')") //以'ROLE_'开头都可以访问
                 .permitAll()

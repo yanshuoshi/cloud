@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * school服务调用接口
  */
@@ -19,4 +21,7 @@ public interface WorkService {
 
     @PostMapping("/plan/add")
     Response saveTPlan(@RequestBody @Validated({ValidationGroup.Add.class}) TPlanReq req);
+
+    @GetMapping("/work/test")
+    Object rs();
 }

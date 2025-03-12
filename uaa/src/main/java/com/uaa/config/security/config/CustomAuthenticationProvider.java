@@ -37,9 +37,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         } else {
             // 密码模式
             Map<String, Object> details = (Map) authentication.getDetails(); // 获取用户类型
-            if ("admin".equals(details.get("user_type"))) {
+            if ("admin".equals(details.get("userType"))) {
                 userDetailsService = securityUserDetailService;
-            } else if ("stu".equals(details.get("user_type"))) {
+            } else if ("stu".equals(details.get("userType"))) {
                 userDetailsService = securityStudentDetailService;
             } else {
                 throw new BadCredentialsException("Invalid user type");

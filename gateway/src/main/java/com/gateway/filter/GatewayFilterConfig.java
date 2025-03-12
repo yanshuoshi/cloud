@@ -1,6 +1,7 @@
 package com.gateway.filter;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gateway.base.Response;
 import com.gateway.utils.EncryptUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -49,8 +50,11 @@ public class GatewayFilterConfig implements GlobalFilter, Ordered {
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
         //1 uaa服务所有放行
-        if (pathMatcher.match("/uaa/**", requestUrl)
-                || pathMatcher.match("/school/actuator/sentinel", requestUrl)) {
+        if (pathMatcher.match("/base/api/**", requestUrl)
+                || pathMatcher.match("/school/actuator/sentinel", requestUrl)
+//                pathMatcher.match("/uaa/**", requestUrl)
+//                ||
+        ) {
             return chain.filter(exchange);
         }
         //2 检查token是否存在
@@ -60,7 +64,7 @@ public class GatewayFilterConfig implements GlobalFilter, Ordered {
         }
         //3 判断是否是黑名单里的token
         String s = redisTemplate.opsForValue().get("base-service:jwtblacklist:" + token);
-        if(StringUtils.isNotBlank(s)){
+        if (StringUtils.isNotBlank(s)) {
             return blacklistToken(exchange);
         }
         //4 判断是否是有效的token
@@ -82,8 +86,26 @@ public class GatewayFilterConfig implements GlobalFilter, Ordered {
             //给header里面添加值
             String base64 = EncryptUtil.encodeUTF8StringBase64(jsonObject.toJSONString());
             ServerHttpRequest tokenRequest = exchange.getRequest().mutate().header("json-token", base64).build();
-            ServerWebExchange build = exchange.mutate().request(tokenRequest).build();
-            return chain.filter(build);
+            ServerWebExchange modifiedExchange = exchange.mutate().request(tokenRequest).build();
+//            ServerWebExchange modifiedExchange = exchange.mutate().build();
+            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                    .header("json-token", base64)
+                    .build();
+
+            System.out.println("Added json-token: " + mutatedRequest.getHeaders().getFirst("json-token"));
+            // 继续执行过滤器链
+            return chain.filter(modifiedExchange).then(Mono.fromRunnable(() -> {
+                // 捕获后端服务的响应
+                ServerHttpResponse response = modifiedExchange.getResponse();
+                if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
+                    // 自定义错误响应
+                    String customResponse = "{\"code\": \"403\", \"message\": \"Access denied: Custom message\"}";
+                    DataBuffer buffer = response.bufferFactory().wrap(customResponse.getBytes(StandardCharsets.UTF_8));
+                    response.setStatusCode(HttpStatus.FORBIDDEN);
+                    response.getHeaders().setContentLength(customResponse.length());
+                    response.writeWith(Mono.just(buffer)).subscribe();
+                }
+            }));
         } catch (InvalidTokenException e) {
             log.error("无效的token: {}", token, e);
             return invalidTokenMono(exchange);

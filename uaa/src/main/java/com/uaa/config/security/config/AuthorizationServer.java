@@ -104,6 +104,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
                 .checkTokenAccess("isAuthenticated()")
                 .allowFormAuthenticationForClients(); // 允许表单认证
     }
+
     /**
      * 配置客户端详细信息服务
      */

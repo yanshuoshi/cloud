@@ -1,5 +1,6 @@
 server:
   port: 8001
+  max-http-header-size: 16KB
 
 spring:
   cloud:
@@ -8,6 +9,7 @@ spring:
         server-addr: 192.168.1.14:8848
         username: yss
         password: 123
+        enabled: true
     sentinel:
       transport:
         dashboard: localhost:8333

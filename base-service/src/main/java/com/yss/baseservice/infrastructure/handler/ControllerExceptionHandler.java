@@ -2,6 +2,7 @@ package com.yss.baseservice.infrastructure.handler;
 
 import com.common.base.BaseException;
 import com.common.base.Response;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -125,6 +126,20 @@ public class ControllerExceptionHandler {
         log.error("Access denied", e);
         return error(HttpStatus.FORBIDDEN.value(), "没有权限");
     }
+
+    /**
+     * 处理无权限访问的异常。
+     *
+     * @param e 访问被拒绝异常
+     * @return 包含错误信息的响应对象
+     */
+    @ExceptionHandler(FeignException.Forbidden.class)
+    @ResponseBody
+    public Response handleFeignForbiddenException(FeignException.Forbidden e) {
+        log.error("Access denied", e);
+        return error(HttpStatus.FORBIDDEN.value(), "没有权限");
+    }
+
 
     /**
      * 处理未预期的异常。
