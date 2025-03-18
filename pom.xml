@@ -12,7 +12,7 @@
         <module>uaa</module>
         <module>common</module>
         <module>base-service</module>
-        <module>work</module>
+        <module>service-starter/work</module>
         <module>service-starter</module>
     </modules>
     <packaging>pom</packaging>
